@@ -38,7 +38,8 @@ class User_model extends CI_model{
         if (isset($route_id) && $this -> db -> update('users',$this)) {
             // Se actualiza correctamente
             $response = array(
-                'error' => null,
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
                 'user' => $this,
             );
 
@@ -46,6 +47,7 @@ class User_model extends CI_model{
         } else {
             // No se pudo actualizar
             $response = array(
+                'error_bool' => TRUE,
                 'error' => $this -> db -> error_message(),
                 'user' => null,
             );

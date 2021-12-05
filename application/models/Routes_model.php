@@ -31,6 +31,7 @@ class Routes_model extends CI_Model
         // El routes ya existe en BD
         if (isset($route_id)) {
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this->db->error_message(),
                 'routes_id' => null,
             );
@@ -43,12 +44,14 @@ class Routes_model extends CI_Model
             if ($this->db->insert('routes', $this)) {
                 // Se insertó
                 $respuesta = array(
-                    'error' => null,
+                    'error_bool' => FALSE,
+                    'error' => array('err' => 'no'),
                     'routes_id' => $this,
                 );
             } else {
                 // No se puede insertar
                 $respuesta = array(
+                    'error_bool' => TRUE,
                     'error' => $this->db->error_message(),
                     'routes_id' => null,
                 );
@@ -68,7 +71,8 @@ class Routes_model extends CI_Model
         if (isset($route_id) && $this -> db -> update('routes',$this)) {
             // Se actualiza correctamente
             $response = array(
-                'error' => null,
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
                 'routes_id' => $this,
             );
 
@@ -76,6 +80,7 @@ class Routes_model extends CI_Model
         } else {
             // No se pudo actualizar
             $response = array(
+                'error_bool' => TRUE,
                 'error' => $this->db->error_message(),
                 'routes_id' => -1,
             );

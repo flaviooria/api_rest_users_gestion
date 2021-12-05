@@ -11,6 +11,9 @@ class Properties extends REST_Controller {
         //Cargamos la database
         $this -> load -> database();
 
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET");
+
         //Cargamos el modelo
         $this -> load -> model('Properties_model');
     }
@@ -21,6 +24,7 @@ class Properties extends REST_Controller {
 
         if(!isset($properties)) {
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
                 'properties' => null
             );
@@ -30,7 +34,8 @@ class Properties extends REST_Controller {
 
         } else {
             $respuesta = array(
-                'error' => null,
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
                 'properties' => $properties
             );
             $this -> response($respuesta);
@@ -60,7 +65,7 @@ class Properties extends REST_Controller {
         if ($this -> form_validation -> run()) {
             $properties = $this -> Properties_model -> clean_data($data);
             $respuesta = $properties -> update($properties);
-            if ($respuesta['error'] == null) {
+            if ($respuesta['error']) {
                 $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
             } else {
                 $this -> response($respuesta);
@@ -68,6 +73,7 @@ class Properties extends REST_Controller {
         } else {
             // Validación fallida
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
                 'properties' => null
             );

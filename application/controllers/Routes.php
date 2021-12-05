@@ -11,6 +11,9 @@ class Routes extends REST_Controller {
         //Cargamos la database
         $this -> load -> database();
 
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET");
+
         //Cargamos el modelo
         $this -> load -> model('Routes_model');
     }
@@ -21,6 +24,7 @@ class Routes extends REST_Controller {
 
         if(!isset($routes)) {
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
                 'routes' => null
             );
@@ -28,7 +32,8 @@ class Routes extends REST_Controller {
             return $respuesta;
         } else {
             $respuesta = array(
-                'error' => null,
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
                 'routes' => $routes
             );
             $this -> response($respuesta);
@@ -57,7 +62,7 @@ class Routes extends REST_Controller {
         if ($this -> form_validation -> run()) {
             $route = $this -> Routes_model -> clean_data($data);
             $respuesta = $route -> insert($route);
-            if ($respuesta['error'] != null) {
+            if ($respuesta['error']) {
                 $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
             } else {
                 $this -> response($respuesta);
@@ -65,6 +70,7 @@ class Routes extends REST_Controller {
         } else {
             // Validación fallida
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
                 'routes' => null
             );
@@ -92,7 +98,7 @@ class Routes extends REST_Controller {
         if ($this -> form_validation -> run()) {
             $route = $this -> Routes_model -> clean_data($data);
             $respuesta = $route -> update($route);
-            if ($respuesta['error'] != null) {
+            if ($respuesta['error']) {
                 $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
             } else {
                 $this -> response($respuesta);
@@ -100,6 +106,7 @@ class Routes extends REST_Controller {
         } else {
             // Validación fallida
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
                 'routes' => null,
             );

@@ -35,7 +35,8 @@ class Properties_model extends CI_Model {
         if (isset($route_id) && $this -> db -> update('properties',$this)) {
             // Se actualiza correctamente
             $response = array(
-                'error' => null,
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
                 'properties' => $this
             );
 
@@ -43,6 +44,7 @@ class Properties_model extends CI_Model {
         } else {
             // No se pudo actualizar
             $response = array(
+                'error_bool' => TRUE,
                 'error' => $this->db->error_message(),
                 'properties' => null
             );

@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH.'/libraries/REST_Controller.php';
 
+
 class Login extends REST_Controller {
 
     public function __construct() {
@@ -11,6 +12,9 @@ class Login extends REST_Controller {
 
         //Cargamos la database
         $this -> load -> database();
+
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET");    
 
         //Cargamos el modelo
         $this -> load -> model('User_model');
@@ -24,6 +28,7 @@ class Login extends REST_Controller {
         //Validar el parámetro
         if (!isset($user_name) || !isset($user_password)) {
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => array('err' => 'Parámetros incorrectos o faltantes'),
                 'user' => null
             );
@@ -35,7 +40,8 @@ class Login extends REST_Controller {
         //Validamos el user
         if ($user == null) {
             $respuesta = array(
-                'error' => array('err' => 'El usuario no existe'),
+                'error_bool' => TRUE,
+                'error' => array('err' => 'El usuario no existe.'),
                 'user' => null
             );
 
@@ -44,7 +50,8 @@ class Login extends REST_Controller {
 
         } else {
             $respuesta = array(
-                'error' => null,
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
                 'user' => $user
             );
 
@@ -79,7 +86,7 @@ class Login extends REST_Controller {
         if ($this -> form_validation -> run()) {
             $user = $this -> User_model -> clean_data($data);
             $respuesta = $user -> update($user);
-            if ($respuesta['error'] == null) {
+            if ($respuesta['error_bool']) {
                 $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
             } else {
                 $this -> response($respuesta);
@@ -87,6 +94,7 @@ class Login extends REST_Controller {
         } else {
             // Validación fallida
             $respuesta = array(
+                'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
                 'user' => null
             );
