@@ -10,17 +10,19 @@ class Routes_model extends CI_Model
     public $subtitle;
     public $text;
 
-    public function get_routes()
+    public function get_routes() // Todo hecho funciona bien como provider
     {
         $query = $this->db->get('routes');
+        $result = $query->custom_result_object('Routes_model');
 
-        $result = $query->custom_row_object(0, 'Routes_model');
-
-        if (isset($result)) {
-            $result->id = intval($result->id);
-            $result->active = boolval($result->active);
+        foreach ($result as $row)
+        {
+            if (isset($row)) {
+                $row->id = intval($row->id);
+                $row->active = boolval($row->active);
+            }
         }
-
+        
         return $result;
     }
 
@@ -32,8 +34,8 @@ class Routes_model extends CI_Model
         if (isset($route_id)) {
             $respuesta = array(
                 'error_bool' => TRUE,
-                'error' => $this->db->error_message(),
-                'routes_id' => null,
+                'error' => array('err' => 'ruta ya existe en la base de datos'),
+                'routes' => array('routes' => null),
             );
             return $respuesta;
         } else {
@@ -46,14 +48,14 @@ class Routes_model extends CI_Model
                 $respuesta = array(
                     'error_bool' => FALSE,
                     'error' => array('err' => 'no'),
-                    'routes_id' => $this,
+                    'routes' => $this,
                 );
             } else {
                 // No se puede insertar
                 $respuesta = array(
                     'error_bool' => TRUE,
-                    'error' => $this->db->error_message(),
-                    'routes_id' => null,
+                    'error' => array('err' => 'no se pudo insertar ruta en la base de datos'),
+                    'routes' => array('routes' => null),
                 );
             }
             return $respuesta;
@@ -73,7 +75,7 @@ class Routes_model extends CI_Model
             $response = array(
                 'error_bool' => FALSE,
                 'error' => array('err' => 'no'),
-                'routes_id' => $this,
+                'routes' => $this,
             );
 
             return $response;
@@ -81,8 +83,8 @@ class Routes_model extends CI_Model
             // No se pudo actualizar
             $response = array(
                 'error_bool' => TRUE,
-                'error' => $this->db->error_message(),
-                'routes_id' => -1,
+                'error' =>  array('err' => 'no se pudo actualizar la ruta en la base de datos'),
+                'routes' => array('routes' => -1),
             );
 
             return $response;

@@ -14,10 +14,41 @@ class Login extends REST_Controller {
         $this -> load -> database();
 
         header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Methods: GET");    
+        header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,OPTIONS");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if($method == "OPTIONS") {
+            die();
+        }
+        
+
 
         //Cargamos el modelo
         $this -> load -> model('User_model');
+    }
+
+    public function all_users_get() {
+        $users = $this -> User_model -> get_all_user();
+
+        if(!isset($users)) {
+            $respuesta = array(
+                'error_bool' => TRUE,
+                'error' => array('err' => 'no existen usuarios en la base de datos'),
+                'user' => array('user' => null)
+            );
+            $this -> response($respuesta, Rest_Controller::HTTP_INTERNAL_SERVER_ERROR);
+            return $respuesta;
+        } else {
+            $respuesta = array(
+                'error_bool' => FALSE,
+                'error' => array('err' => 'no'),
+                'user' => $users
+            );
+            $this -> response($respuesta);
+            return ;
+        }
+
+        $users = $this -> User_model -> get_all_user();
+        $this -> response($users);
     }
 
     //Esto es para obtener los resultados
@@ -30,7 +61,7 @@ class Login extends REST_Controller {
             $respuesta = array(
                 'error_bool' => TRUE,
                 'error' => array('err' => 'Parámetros incorrectos o faltantes'),
-                'user' => null
+                'user' => array('user' => null),
             );
             $this -> response($respuesta, Rest_Controller::HTTP_BAD_REQUEST);
             return ;
@@ -42,7 +73,7 @@ class Login extends REST_Controller {
             $respuesta = array(
                 'error_bool' => TRUE,
                 'error' => array('err' => 'El usuario no existe.'),
-                'user' => null
+                'user' => array('user' => null),
             );
 
             $this -> response($respuesta, Rest_Controller::HTTP_INTERNAL_SERVER_ERROR);
@@ -96,7 +127,7 @@ class Login extends REST_Controller {
             $respuesta = array(
                 'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
-                'user' => null
+                'user' => array('user' => null),
             );
 
             $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);

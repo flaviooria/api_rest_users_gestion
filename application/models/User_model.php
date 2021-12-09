@@ -28,6 +28,23 @@ class User_model extends CI_model{
         }
     }
 
+    public function get_all_user()
+    {
+        $query = $this->db->get('users');
+        $result = $query->custom_result_object('User_model');
+
+        foreach ($result as $row)
+        {
+            if (isset($row)) {
+                $row->id = intval($row->id);
+                $row->isActive = boolval($row->isActive);
+                $row->isAdmin = boolval($row->isAdmin);
+            }
+        }
+        
+        return $result;
+    }
+
     public function update($user){
         $query = $this -> db -> get_where('users', array('id' => $this -> id));
         $route_id = $query -> row();
@@ -49,7 +66,7 @@ class User_model extends CI_model{
             $response = array(
                 'error_bool' => TRUE,
                 'error' => $this -> db -> error_message(),
-                'user' => null,
+                'user' => array('user' => null),
             );
 
             return $response;

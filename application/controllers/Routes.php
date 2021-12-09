@@ -4,15 +4,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 require APPPATH.'/libraries/REST_Controller.php';
 
 class Routes extends REST_Controller {
-    public function __construct()
-    {
+    public function __construct(){
         parent::__construct();
 
         //Cargamos la database
         $this -> load -> database();
 
         header("Access-Control-Allow-Origin: *");
-        header("Access-Control-Allow-Methods: GET");
+        header("Access-Control-Allow-Methods: GET,PUT,POST,DELETE,OPTIONS");
+        $method = $_SERVER['REQUEST_METHOD'];
+        if($method == "OPTIONS") {
+            die();
+        }
 
         //Cargamos el modelo
         $this -> load -> model('Routes_model');
@@ -26,8 +29,9 @@ class Routes extends REST_Controller {
             $respuesta = array(
                 'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
-                'routes' => null
+                'routes' => array('routes' => null)
             );
+            
             $this -> response($respuesta, Rest_Controller::HTTP_INTERNAL_SERVER_ERROR);
             return $respuesta;
         } else {
@@ -49,21 +53,28 @@ class Routes extends REST_Controller {
         $data = $this -> post();
         // Esto es por si nos mandan un objeto vacio que el formulario actúe
         if (empty($data)) $data = array('error' => 'error');
+       
         // Cargo la librería form_validation que trae CodeIgniter.
         $this -> load -> library('form_validation');
+        
         // Le digo al form validation, que datos debe validar
         $this -> form_validation -> set_data($data);
+        
         // Aplico la validación con campo, etiqueta y regla.
         $this -> form_validation -> set_rules('active', 'activo', 'required');
         $this -> form_validation -> set_rules('icon', 'icono', 'required');
         $this -> form_validation -> set_rules('page', 'pagina', 'required');
         $this -> form_validation -> set_rules('text', 'texto', 'required');
+
+
         // TRUE: Todo ok, FALSE: Errores de validación
         if ($this -> form_validation -> run()) {
             $route = $this -> Routes_model -> clean_data($data);
+
             $respuesta = $route -> insert($route);
-            if ($respuesta['error']) {
-                $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
+
+            if ($respuesta['error_bool']) {
+                $this -> response($respuesta, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
             } else {
                 $this -> response($respuesta);
             }
@@ -72,11 +83,11 @@ class Routes extends REST_Controller {
             $respuesta = array(
                 'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
-                'routes' => null
+                'routes' => array('routes' => null)
             );
 
             $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
-        }
+        } 
     }
 
     public function routes_put() {
@@ -98,8 +109,8 @@ class Routes extends REST_Controller {
         if ($this -> form_validation -> run()) {
             $route = $this -> Routes_model -> clean_data($data);
             $respuesta = $route -> update($route);
-            if ($respuesta['error']) {
-                $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);
+            if ($respuesta['error_bool']) {
+                $this -> response($respuesta, REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
             } else {
                 $this -> response($respuesta);
             }
@@ -108,7 +119,7 @@ class Routes extends REST_Controller {
             $respuesta = array(
                 'error_bool' => TRUE,
                 'error' => $this -> form_validation -> get_errores_arreglo(),
-                'routes' => null,
+                'routes' => array('routes' => null)
             );
 
             $this -> response($respuesta, REST_Controller::HTTP_BAD_REQUEST);

@@ -45,8 +45,8 @@ class Properties_model extends CI_Model {
             // No se pudo actualizar
             $response = array(
                 'error_bool' => TRUE,
-                'error' => $this->db->error_message(),
-                'properties' => null
+                'error' => array('err' => 'no se pudo actualizar properties'),
+                'properties' => array('properties' => null)
             );
 
             return $response;
